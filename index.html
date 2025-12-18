@@ -12,11 +12,21 @@
 
   /* ゲームオーバー画面 */
   #gameover_screen {
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:white; display:none; justify-content:center; align-items:center;
-    flex-direction:column; font-size:40px;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:white;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    font-size:40px;
+    z-index:900;
   }
-  #gameover_score { font-size:60px; margin:20px; }
+  #gameover_score {
+    font-size:60px;
+    margin:20px;
+  }
 
   /* ゲームオーバー時の画像表示 */
   #effect_image {
@@ -25,7 +35,7 @@
     top:40%;
     left:50%;
     transform:translate(-50%, -50%);
-    z-index:999;
+    z-index:950;
   }
   #effect_img {
     width:200px;
@@ -50,7 +60,7 @@
   <div style="font-size:24px;">画面をタップして再スタート</div>
 </div>
 
-<!-- ゲームオーバー時の画像表示 -->
+<!-- ★ ゲームオーバー時に表示する画像 -->
 <div id="effect_image">
   <img id="effect_img" src="">
 </div>
@@ -131,7 +141,6 @@ function checkAnswer(selectedId) {
   if (gameover) return;
 
   if (selectedId === correctId) {
-    // 正解
     combo++;
     const rank = getComboRank(combo);
 
@@ -149,7 +158,6 @@ function checkAnswer(selectedId) {
     startRound();
 
   } else {
-    // MISS（変更なし）
     combo = 0;
     document.getElementById("combo").innerText = "";
     showMiss();
@@ -177,10 +185,10 @@ function doGameOver() {
   // ★ p5 の音を再生
   document.getElementById("p5").play();
 
-  // ★ p5 の画像を表示（例: p5_wa.png）
+  // ★ p5_wa の画像を表示
   const effect = document.getElementById("effect_image");
   const img = document.getElementById("effect_img");
-  img.src = "p5_wa.png";  // ← 画像ファイル名に合わせて変更
+  img.src = "p5_wa.png";  // ← index.html と同じフォルダにある前提
   effect.style.display = "block";
 
   // 画像は 1.5 秒後に消す
