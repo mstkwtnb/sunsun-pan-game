@@ -11,7 +11,7 @@
   }
 
   body {
-    font-size:22px;
+    font-size:26px; /* ← 全体 1.2倍 */
     width:100vw;
     height:100vh;
     overflow:hidden;
@@ -31,12 +31,13 @@
   }
 
   h1 {
-    margin-top:10px;
-    font-size:28px;
+    margin-top:12px;
+    font-size:34px; /* 28px → 34px */
   }
 
   #score {
-    margin-top:5px;
+    margin-top:6px;
+    font-size:31px; /* 26px → 31px */
   }
 
   /* ✅ コンボブロック（パン画像の後ろ・画面中央） */
@@ -46,7 +47,7 @@
     left:50%;
     transform:translate(-50%, -50%);
     text-align:center;
-    z-index:300; /* パン画像より後ろ */
+    z-index:300;
     pointer-events:none;
     display:none;
   }
@@ -59,7 +60,7 @@
   #combo_rank {
     color:#ff5500;
     font-weight:bold;
-    margin-top:5px;
+    margin-top:8px;
   }
 
   /* ✅ 跳ねるアニメーション */
@@ -73,10 +74,17 @@
     animation: comboBounce 0.4s ease-out;
   }
 
+  /* ✅ MISS 表示（中央・1.2倍） */
   #miss {
-    font-size:40px;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    font-size:96px; /* 80px → 96px */
     color:red;
+    z-index:700;
     display:none;
+    pointer-events:none;
   }
 
   /* パン画像の2×2レイアウト（スマホ対応） */
@@ -84,26 +92,26 @@
     display:grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap:10px;
+    gap:12px;
     width:100%;
     flex-grow:1;
-    padding:10px;
+    padding:12px;
     justify-items:center;
     align-items:center;
     z-index:500;
   }
 
   #images img {
-    width:35vw;
-    max-width:180px;
+    width:42vw; /* 35vw → 42vw */
+    max-width:216px; /* 180px → 216px */
   }
 
   /* ハート（ライフ）をパン画像の下に中央配置 */
   #life {
     position:relative;
     bottom:0;
-    margin-bottom:15px;
-    font-size:60px;
+    margin-bottom:18px;
+    font-size:72px; /* 60px → 72px */
     text-align:center;
     z-index:600;
   }
@@ -118,7 +126,7 @@
     flex-direction:column;
     justify-content:space-between;
     align-items:center;
-    padding:40px 0;
+    padding:48px 0;
     z-index:900;
   }
 
@@ -136,8 +144,8 @@
   }
 
   .panel_bottom {
-    font-size:24px;
-    margin-bottom:15vh; /* ✅ ハートに被らないように調整 */
+    font-size:29px; /* 24px → 29px */
+    margin-bottom:15vh;
   }
 
   /* p5_wa.png（中央・後ろ側） */
@@ -152,8 +160,8 @@
   }
 
   .effect_image img {
-    width:60vw;
-    max-width:350px;
+    width:72vw; /* 60vw → 72vw */
+    max-width:420px; /* 350px → 420px */
   }
 </style>
 </head>
@@ -170,7 +178,7 @@
   <div id="combo_rank"></div>
 </div>
 
-<div id="miss">MISS!!</div>
+<div id="miss">MISS...</div>
 
 <div id="images"></div>
 
@@ -182,8 +190,8 @@
 <div id="start_screen" class="full_screen_panel">
 
   <div class="panel_top">
-    <div style="font-size:40px;">どのパンかな？</div>
-    <div style="font-size:24px; margin-top:10px;">連続正解してスコアを稼ごう！</div>
+    <div style="font-size:48px;">どのパンかな？</div>
+    <div style="font-size:29px; margin-top:12px;">連続正解してスコアを稼ごう！</div>
   </div>
 
   <div class="panel_center">
@@ -200,8 +208,8 @@
 <div id="gameover_screen" class="full_screen_panel">
 
   <div class="panel_top">
-    <div style="font-size:40px;">GAME OVER</div>
-    <div id="gameover_score" style="font-size:60px;"></div>
+    <div style="font-size:48px;">GAME OVER</div>
+    <div id="gameover_score" style="font-size:72px;"></div>
   </div>
 
   <div class="panel_center">
@@ -287,8 +295,8 @@ function checkAnswer(selectedId) {
     comboBlock.style.display = "block";
 
     /* ✅ 動的フォントサイズ（最小サイズ + combo×0.1） */
-    const baseNum = 64;   // コンボ数の最小サイズ
-    const baseRank = 96;  // ランク表示の最小サイズ
+    const baseNum = 77;   // 64px × 1.2
+    const baseRank = 115; // 96px × 1.2
     const add = combo * 0.1;
 
     comboNum.style.fontSize = (baseNum + add) + "px";
@@ -361,11 +369,11 @@ function restartGame() {
 
 /* ✅ スタート画面から開始 */
 document.getElementById("start_screen").style.display = "flex";
-document.getElementById("life").style.display = "none"; // ← ハート非表示
+document.getElementById("life").style.display = "none";
 
 document.getElementById("start_screen").onclick = () => {
   document.getElementById("start_screen").style.display = "none";
-  document.getElementById("life").style.display = "block"; // ← ゲーム開始で表示
+  document.getElementById("life").style.display = "block";
   startRound();
 };
 
