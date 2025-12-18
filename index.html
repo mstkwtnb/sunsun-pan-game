@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>SunSun パンゲーム</title>
+<style>
+  body { text-align:center; font-size:22px; }
+  img { width:120px; margin:10px; }
+</style>
+</head>
+<body>
+
+<h1>SunSun パンゲーム</h1>
+<p id="score">スコア: 0</p>
+
+<div id="images"></div>
+<div id="gameover" style="display:none;">
+  <h2>ゲームオーバー！</h2>
+  <img id="gameover_img" src="p5_wa.png" style="width:200px;">
+</div>
+
+<!-- SE 読み込み -->
+<audio id="p1" src="p1_shokupan.m4a"></audio>
+<audio id="p2" src="p2_koppepan.m4a"></audio>
+<audio id="p3" src="p3_meronpan.m4a"></audio>
+<audio id="p4" src="p4_kurowassan.m4a"></audio>
+<audio id="p5" src="p5_wa.m4a"></audio>
+
+<script>
+// 正解候補（4種類）
+const breads = [
+  { id: "p1", img: "p1_shokupan.png" },
+  { id: "p2", img: "p2_koppepan.png" },
+  { id: "p3", img: "p3_meronpan.png" },
+  { id: "p4", img: "p4_kurowassan.png" },
+];
+
+let score = 0;
+let correctId = "";
+
+function startRound() {
+  // ゲームオーバー画面を隠す
+  document.getElementById("gameover").style.display = "none";
+
+  // p1〜p4 の中からランダムで選ぶ
+  const choice = breads[Math.floor(Math.random() * breads.length)];
+  correctId = choice.id;
+
+  // SE 再生
+  document.getElementById(choice.id).play();
+
+  // 画像を並べる
+  const container = document.getElementById("images");
+  container.innerHTML = "";
+
+  breads.forEach(b => {
+    const img = document.createElement("img");
+    img.src = b.img;
+    img.onclick = () => checkAnswer(b.id);
+    container.appendChild(img);
+  });
+}
+
+function checkAnswer(selectedId) {
+  if (selectedId === correctId) {
+    // 正解
+    score++;
+    document.getElementById("score").innerText = "スコア: " + score;
+    startRound();
+  } else {
+    // ゲームオーバー
+    document.getElementById("p5").play();
+
+    // ゲームオーバー画面表示
+    document.getElementById("images").innerHTML = "";
+    document.getElementById("gameover").style.display = "block";
+
+    // スコアリセット
+    score = 0;
+    document.getElementById("score").innerText = "スコア: 0";
+
+    // 2秒後に再スタート
+    setTimeout(startRound, 2000);
+  }
+}
+
+// ゲーム開始
+startRound();
+</script>
+
+</body>
+</html>
