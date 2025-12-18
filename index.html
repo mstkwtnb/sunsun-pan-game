@@ -39,13 +39,30 @@
     margin-top:5px;
   }
 
-  #combo {
-    font-size:32px;
-    color:#ff8800;
-    height:40px;
+  /* ✅ コンボブロック（パン画像の後ろ・画面中央） */
+  #combo_block {
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    text-align:center;
+    z-index:300; /* パン画像より後ろ */
+    pointer-events:none;
+    display:none;
   }
 
-  /* コンボの跳ねるアニメーション */
+  #combo_number {
+    color:#ff8800;
+    font-weight:bold;
+  }
+
+  #combo_rank {
+    color:#ff5500;
+    font-weight:bold;
+    margin-top:5px;
+  }
+
+  /* ✅ 跳ねるアニメーション */
   @keyframes comboBounce {
     0% { transform: scale(1); }
     30% { transform: scale(1.4); }
@@ -73,6 +90,7 @@
     padding:10px;
     justify-items:center;
     align-items:center;
+    z-index:500;
   }
 
   #images img {
@@ -85,9 +103,9 @@
     position:relative;
     bottom:0;
     margin-bottom:15px;
-    font-size:60px; /* ← 3倍に拡大 */
+    font-size:60px;
     text-align:center;
-    z-index:1000;
+    z-index:600;
   }
 
   /* スタート画面 & ゲームオーバー画面 共通構造 */
@@ -145,7 +163,13 @@
 
 <h1>SunSun パンゲーム</h1>
 <p id="score">スコア: 0</p>
-<div id="combo"></div>
+
+<!-- ✅ コンボブロック（中央・パン画像の後ろ） -->
+<div id="combo_block">
+  <div id="combo_number"></div>
+  <div id="combo_rank"></div>
+</div>
+
 <div id="miss">MISS!!</div>
 
 <div id="images"></div>
@@ -212,8 +236,8 @@ let life = 3;
 let correctId = "";
 let gameover = false;
 
-/* ✅ コンボ文字列 */
-function getComboText(c) {
+/* ✅ ランク文字列 */
+function getComboRank(c) {
   if (c >= 100) return "SSS!!!!!";
   if (c >= 50) return "SS!!!";
   if (c >= 30) return "S!!";
@@ -254,15 +278,29 @@ function checkAnswer(selectedId) {
   if (selectedId === correctId) {
     combo++;
 
-    const comboText = getComboText(combo);
-    const comboDiv = document.getElementById("combo");
+    const rank = getComboRank(combo);
 
-    comboDiv.innerText = comboText;
+    const comboBlock = document.getElementById("combo_block");
+    const comboNum = document.getElementById("combo_number");
+    const comboRank = document.getElementById("combo_rank");
 
-    // ✅ 跳ねるアニメーション
-    comboDiv.classList.remove("combo-anim");
-    void comboDiv.offsetWidth;
-    comboDiv.classList.add("combo-anim");
+    comboBlock.style.display = "block";
+
+    /* ✅ 動的フォントサイズ */
+    const baseNum = 32 * 2;
+    const baseRank = 32 * 3;
+    const add = combo * 0.1;
+
+    comboNum.style.fontSize = (baseNum + add) + "px";
+    comboRank.style.fontSize = (baseRank + add) + "px";
+
+    comboNum.innerText = combo;
+    comboRank.innerText = rank;
+
+    /* ✅ 跳ねるアニメーション */
+    comboBlock.classList.remove("combo-anim");
+    void comboBlock.offsetWidth;
+    comboBlock.classList.add("combo-anim");
 
     score++;
     document.getElementById("score").innerText = "スコア: " + score;
@@ -271,7 +309,8 @@ function checkAnswer(selectedId) {
 
   } else {
     combo = 0;
-    document.getElementById("combo").innerText = "";
+    document.getElementById("combo_block").style.display = "none";
+
     showMiss();
 
     life--;
@@ -297,7 +336,7 @@ function doGameOver() {
   document.getElementById("p5").play();
 
   document.getElementById("images").innerHTML = "";
-  document.getElementById("combo").innerText = "";
+  document.getElementById("combo_block").style.display = "none";
 
   const screen = document.getElementById("gameover_screen");
   document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
@@ -322,8 +361,11 @@ function restartGame() {
 
 /* ✅ スタート画面から開始 */
 document.getElementById("start_screen").style.display = "flex";
+document.getElementById("life").style.display = "none"; // ← ハート非表示
+
 document.getElementById("start_screen").onclick = () => {
   document.getElementById("start_screen").style.display = "none";
+  document.getElementById("life").style.display = "block"; // ← ゲーム開始で表示
   startRound();
 };
 
