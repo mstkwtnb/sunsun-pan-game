@@ -11,7 +11,7 @@
   }
 
   body {
-    font-size:26px; /* ← 全体 1.2倍 */
+    font-size:44px; /* ← 全体 2倍 */
     width:100vw;
     height:100vh;
     overflow:hidden;
@@ -31,13 +31,13 @@
   }
 
   h1 {
-    margin-top:12px;
-    font-size:34px; /* 28px → 34px */
+    margin-top:20px;
+    font-size:56px; /* 28px → 56px */
   }
 
   #score {
-    margin-top:6px;
-    font-size:31px; /* 26px → 31px */
+    margin-top:10px;
+    font-size:52px; /* 26px → 52px */
   }
 
   /* ✅ コンボブロック（パン画像の後ろ・画面中央） */
@@ -60,7 +60,7 @@
   #combo_rank {
     color:#ff5500;
     font-weight:bold;
-    margin-top:8px;
+    margin-top:20px;
   }
 
   /* ✅ 跳ねるアニメーション */
@@ -74,13 +74,13 @@
     animation: comboBounce 0.4s ease-out;
   }
 
-  /* ✅ MISS 表示（中央・1.2倍） */
+  /* ✅ MISS 表示（中央・2倍） */
   #miss {
     position:fixed;
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
-    font-size:96px; /* 80px → 96px */
+    font-size:160px; /* 80px → 160px */
     color:red;
     z-index:700;
     display:none;
@@ -92,26 +92,26 @@
     display:grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap:12px;
+    gap:20px;
     width:100%;
     flex-grow:1;
-    padding:12px;
+    padding:20px;
     justify-items:center;
     align-items:center;
     z-index:500;
   }
 
   #images img {
-    width:42vw; /* 35vw → 42vw */
-    max-width:216px; /* 180px → 216px */
+    width:35vw;
+    max-width:180px;
   }
 
   /* ハート（ライフ）をパン画像の下に中央配置 */
   #life {
     position:relative;
     bottom:0;
-    margin-bottom:18px;
-    font-size:72px; /* 60px → 72px */
+    margin-bottom:30px;
+    font-size:120px; /* 60px → 120px */
     text-align:center;
     z-index:600;
   }
@@ -126,7 +126,7 @@
     flex-direction:column;
     justify-content:space-between;
     align-items:center;
-    padding:48px 0;
+    padding:80px 0;
     z-index:900;
   }
 
@@ -144,7 +144,7 @@
   }
 
   .panel_bottom {
-    font-size:29px; /* 24px → 29px */
+    font-size:48px; /* 24px → 48px */
     margin-bottom:15vh;
   }
 
@@ -160,8 +160,8 @@
   }
 
   .effect_image img {
-    width:72vw; /* 60vw → 72vw */
-    max-width:420px; /* 350px → 420px */
+    width:60vw;
+    max-width:350px;
   }
 </style>
 </head>
@@ -190,8 +190,8 @@
 <div id="start_screen" class="full_screen_panel">
 
   <div class="panel_top">
-    <div style="font-size:48px;">どのパンかな？</div>
-    <div style="font-size:29px; margin-top:12px;">連続正解してスコアを稼ごう！</div>
+    <div style="font-size:80px;">どのパンかな？</div>
+    <div style="font-size:48px; margin-top:20px;">連続正解してスコアを稼ごう！</div>
   </div>
 
   <div class="panel_center">
@@ -208,8 +208,8 @@
 <div id="gameover_screen" class="full_screen_panel">
 
   <div class="panel_top">
-    <div style="font-size:48px;">GAME OVER</div>
-    <div id="gameover_score" style="font-size:72px;"></div>
+    <div style="font-size:80px;">GAME OVER</div>
+    <div id="gameover_score" style="font-size:120px;"></div>
   </div>
 
   <div class="panel_center">
@@ -294,10 +294,10 @@ function checkAnswer(selectedId) {
 
     comboBlock.style.display = "block";
 
-    /* ✅ 動的フォントサイズ（最小サイズ + combo×0.1） */
-    const baseNum = 77;   // 64px × 1.2
-    const baseRank = 115; // 96px × 1.2
-    const add = combo * 0.1;
+    /* ✅ 動的フォントサイズ（最小サイズ + combo×1） */
+    const baseNum = 128;   // 64px × 2
+    const baseRank = 192;  // 96px × 2
+    const add = combo * 1;
 
     comboNum.style.fontSize = (baseNum + add) + "px";
     comboRank.style.fontSize = (baseRank + add) + "px";
