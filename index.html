@@ -5,12 +5,29 @@
 <title>SunSun パンゲーム</title>
 <style>
   body { text-align:center; font-size:22px; margin:0; padding:0; }
-  img { width:120px; margin:10px; }
+
+  /* パン画像を大きくして2×2に配置 */
+  #images {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap:20px;
+    width:100%;
+    max-width:500px;
+    margin:0 auto;
+    margin-top:20px;
+  }
+  #images img {
+    width:150px;   /* ← 大きくした */
+    height:auto;
+    margin:auto;
+  }
+
   #life { position:fixed; bottom:10px; left:10px; font-size:28px; }
   #combo { font-size:28px; color:#ff8800; height:40px; }
   #miss { font-size:40px; color:red; display:none; }
 
-  /* ゲームオーバー画面 */
+  /* ゲームオーバー画面（前面） */
   #gameover_screen {
     position:fixed;
     top:0; left:0;
@@ -21,24 +38,25 @@
     align-items:center;
     flex-direction:column;
     font-size:40px;
-    z-index:900;
+    z-index:900; /* ← 画像より前 */
   }
   #gameover_score {
     font-size:60px;
     margin:20px;
   }
 
-  /* ゲームオーバー時の画像表示 */
+  /* ゲームオーバー時の画像（後ろ側） */
   #effect_image {
     display:none;
     position:fixed;
-    top:40%;
+    top:50%;
     left:50%;
     transform:translate(-50%, -50%);
-    z-index:950;
+    z-index:500; /* ← GAME OVER より後ろ */
+    opacity:0.4; /* 少し薄くして背景感を出す */
   }
   #effect_img {
-    width:200px;
+    width:300px;
   }
 </style>
 </head>
@@ -60,7 +78,7 @@
   <div style="font-size:24px;">画面をタップして再スタート</div>
 </div>
 
-<!-- ★ ゲームオーバー時に表示する画像 -->
+<!-- ★ ゲームオーバー時に表示する画像（後ろ側） -->
 <div id="effect_image">
   <img id="effect_img" src="">
 </div>
@@ -185,16 +203,13 @@ function doGameOver() {
   // ★ p5 の音を再生
   document.getElementById("p5").play();
 
-  // ★ p5_wa の画像を表示
+  // ★ p5_wa の画像を表示（後ろ側）
   const effect = document.getElementById("effect_image");
   const img = document.getElementById("effect_img");
-  img.src = "p5_wa.png";  // ← index.html と同じフォルダにある前提
+  img.src = "p5_wa.png";
   effect.style.display = "block";
 
-  // 画像は 1.5 秒後に消す
-  setTimeout(() => {
-    effect.style.display = "none";
-  }, 1500);
+  // ★ 画像はタップするまで消さない（setTimeout 削除）
 
   document.getElementById("images").innerHTML = "";
   document.getElementById("combo").innerText = "";
@@ -203,6 +218,7 @@ function doGameOver() {
   document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
   screen.style.display = "flex";
 
+  // タップで再スタート
   screen.onclick = () => restartGame();
 }
 
@@ -215,6 +231,8 @@ function restartGame() {
   document.getElementById("score").innerText = "スコア: 0";
   updateLife();
 
+  // ★ ゲームオーバー画像も消す
+  document.getElementById("effect_image").style.display = "none";
   document.getElementById("gameover_screen").style.display = "none";
 
   startRound();
