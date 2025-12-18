@@ -9,12 +9,27 @@
   #life { position:fixed; bottom:10px; left:10px; font-size:28px; }
   #combo { font-size:28px; color:#ff8800; height:40px; }
   #miss { font-size:40px; color:red; display:none; }
+
+  /* ゲームオーバー画面 */
   #gameover_screen {
     position:fixed; top:0; left:0; width:100%; height:100%;
     background:white; display:none; justify-content:center; align-items:center;
     flex-direction:column; font-size:40px;
   }
   #gameover_score { font-size:60px; margin:20px; }
+
+  /* ゲームオーバー時の画像表示 */
+  #effect_image {
+    display:none;
+    position:fixed;
+    top:40%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    z-index:999;
+  }
+  #effect_img {
+    width:200px;
+  }
 </style>
 </head>
 <body>
@@ -33,6 +48,11 @@
   <div>GAME OVER</div>
   <div id="gameover_score"></div>
   <div style="font-size:24px;">画面をタップして再スタート</div>
+</div>
+
+<!-- ゲームオーバー時の画像表示 -->
+<div id="effect_image">
+  <img id="effect_img" src="">
 </div>
 
 <!-- SE 読み込み -->
@@ -115,14 +135,12 @@ function checkAnswer(selectedId) {
     combo++;
     const rank = getComboRank(combo);
 
-    // ランク表示
-    document.getElementById("combo").innerText = rank ? `COMBO ${combo} (${rank})` : `COMBO ${combo}`;
+    document.getElementById("combo").innerText =
+      rank ? `COMBO ${combo} (${rank})` : `COMBO ${combo}`;
 
-    // ランクに応じてスコア加算
     score += getScoreBonus(rank);
     document.getElementById("score").innerText = "スコア: " + score;
 
-    // S以上でライフ+1
     if (rank === "S" || rank === "SS" || rank === "SSS") {
       life++;
       updateLife();
@@ -131,7 +149,7 @@ function checkAnswer(selectedId) {
     startRound();
 
   } else {
-    // MISS
+    // MISS（変更なし）
     combo = 0;
     document.getElementById("combo").innerText = "";
     showMiss();
@@ -155,7 +173,20 @@ function showMiss() {
 
 function doGameOver() {
   gameover = true;
+
+  // ★ p5 の音を再生
   document.getElementById("p5").play();
+
+  // ★ p5 の画像を表示（例: p5_wa.png）
+  const effect = document.getElementById("effect_image");
+  const img = document.getElementById("effect_img");
+  img.src = "p5_wa.png";  // ← 画像ファイル名に合わせて変更
+  effect.style.display = "block";
+
+  // 画像は 1.5 秒後に消す
+  setTimeout(() => {
+    effect.style.display = "none";
+  }, 1500);
 
   document.getElementById("images").innerHTML = "";
   document.getElementById("combo").innerText = "";
@@ -164,7 +195,6 @@ function doGameOver() {
   document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
   screen.style.display = "flex";
 
-  // タップで再スタート
   screen.onclick = () => restartGame();
 }
 
