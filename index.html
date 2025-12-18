@@ -4,19 +4,35 @@
 <meta charset="UTF-8">
 <title>SunSun パンゲーム</title>
 <style>
-  body { text-align:center; font-size:22px; }
+  body { text-align:center; font-size:22px; margin:0; padding:0; }
   img { width:120px; margin:10px; }
+  #life { position:fixed; bottom:10px; left:10px; font-size:28px; }
+  #combo { font-size:28px; color:#ff8800; height:40px; }
+  #miss { font-size:40px; color:red; display:none; }
+  #gameover_screen {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:white; display:none; justify-content:center; align-items:center;
+    flex-direction:column; font-size:40px;
+  }
+  #gameover_score { font-size:60px; margin:20px; }
 </style>
 </head>
 <body>
 
 <h1>SunSun パンゲーム</h1>
 <p id="score">スコア: 0</p>
+<div id="combo"></div>
+<div id="miss">MISS!!</div>
 
 <div id="images"></div>
-<div id="gameover" style="display:none;">
-  <h2>ゲームオーバー！</h2>
-  <img id="gameover_img" src="p5_wa.png" style="width:200px;">
+
+<div id="life">❤️❤️❤️</div>
+
+<!-- ゲームオーバー画面 -->
+<div id="gameover_screen">
+  <div>GAME OVER</div>
+  <div id="gameover_score"></div>
+  <div style="font-size:24px;">画面をタップして再スタート</div>
 </div>
 
 <!-- SE 読み込み -->
@@ -27,7 +43,7 @@
 <audio id="p5" src="p5_wa.m4a"></audio>
 
 <script>
-// 正解候補（4種類）
+// パンデータ
 const breads = [
   { id: "p1", img: "p1_shokupan.png" },
   { id: "p2", img: "p2_koppepan.png" },
@@ -36,20 +52,50 @@ const breads = [
 ];
 
 let score = 0;
+let combo = 0;
+let life = 3;
 let correctId = "";
+let gameover = false;
+
+// ライフ表示
+function updateLife() {
+  document.getElementById("life").innerText = "❤️".repeat(life);
+}
+
+// コンボランク判定
+function getComboRank(c) {
+  if (c >= 100) return "SSS";
+  if (c >= 50) return "SS";
+  if (c >= 30) return "S";
+  if (c >= 20) return "A";
+  if (c >= 10) return "B";
+  if (c >= 6) return "C";
+  if (c >= 3) return "D";
+  return "";
+}
+
+// ランクごとのスコア加算
+function getScoreBonus(rank) {
+  switch(rank) {
+    case "D": return 2;
+    case "C": return 3;
+    case "B": return 5;
+    case "A": return 10;
+    case "S": return 20;
+    case "SS": return 50;
+    case "SSS": return 100;
+    default: return 1;
+  }
+}
 
 function startRound() {
-  // ゲームオーバー画面を隠す
-  document.getElementById("gameover").style.display = "none";
+  if (gameover) return;
 
-  // p1〜p4 の中からランダムで選ぶ
   const choice = breads[Math.floor(Math.random() * breads.length)];
   correctId = choice.id;
 
-  // SE 再生
   document.getElementById(choice.id).play();
 
-  // 画像を並べる
   const container = document.getElementById("images");
   container.innerHTML = "";
 
@@ -62,29 +108,82 @@ function startRound() {
 }
 
 function checkAnswer(selectedId) {
+  if (gameover) return;
+
   if (selectedId === correctId) {
     // 正解
-    score++;
+    combo++;
+    const rank = getComboRank(combo);
+
+    // ランク表示
+    document.getElementById("combo").innerText = rank ? `COMBO ${combo} (${rank})` : `COMBO ${combo}`;
+
+    // ランクに応じてスコア加算
+    score += getScoreBonus(rank);
     document.getElementById("score").innerText = "スコア: " + score;
+
+    // S以上でライフ+1
+    if (rank === "S" || rank === "SS" || rank === "SSS") {
+      life++;
+      updateLife();
+    }
+
     startRound();
+
   } else {
-    // ゲームオーバー
-    document.getElementById("p5").play();
+    // MISS
+    combo = 0;
+    document.getElementById("combo").innerText = "";
+    showMiss();
 
-    // ゲームオーバー画面表示
-    document.getElementById("images").innerHTML = "";
-    document.getElementById("gameover").style.display = "block";
+    life--;
+    updateLife();
 
-    // スコアリセット
-    score = 0;
-    document.getElementById("score").innerText = "スコア: 0";
-
-    // 2秒後に再スタート
-    setTimeout(startRound, 2000);
+    if (life <= 0) {
+      doGameOver();
+    } else {
+      startRound();
+    }
   }
 }
 
+function showMiss() {
+  const miss = document.getElementById("miss");
+  miss.style.display = "block";
+  setTimeout(() => miss.style.display = "none", 1000);
+}
+
+function doGameOver() {
+  gameover = true;
+  document.getElementById("p5").play();
+
+  document.getElementById("images").innerHTML = "";
+  document.getElementById("combo").innerText = "";
+
+  const screen = document.getElementById("gameover_screen");
+  document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
+  screen.style.display = "flex";
+
+  // タップで再スタート
+  screen.onclick = () => restartGame();
+}
+
+function restartGame() {
+  score = 0;
+  combo = 0;
+  life = 3;
+  gameover = false;
+
+  document.getElementById("score").innerText = "スコア: 0";
+  updateLife();
+
+  document.getElementById("gameover_screen").style.display = "none";
+
+  startRound();
+}
+
 // ゲーム開始
+updateLife();
 startRound();
 </script>
 
