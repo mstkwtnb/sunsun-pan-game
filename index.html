@@ -40,9 +40,20 @@
   }
 
   #combo {
-    font-size:28px;
+    font-size:32px;
     color:#ff8800;
     height:40px;
+  }
+
+  /* コンボの跳ねるアニメーション */
+  @keyframes comboBounce {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.4); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+  .combo-anim {
+    animation: comboBounce 0.4s ease-out;
   }
 
   #miss {
@@ -79,8 +90,8 @@
     z-index:1000;
   }
 
-  /* ゲームオーバー画面（上・中央・下に分割） */
-  #gameover_screen {
+  /* スタート画面 & ゲームオーバー画面 共通構造 */
+  .full_screen_panel {
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
@@ -93,38 +104,38 @@
     z-index:900;
   }
 
-  #gameover_top {
+  .panel_top {
     text-align:center;
   }
 
-  #gameover_top div:first-child {
-    font-size:40px;
+  .panel_center {
+    position:relative;
+    width:100%;
+    height:40%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
   }
 
-  #gameover_score {
-    font-size:60px;
-    margin-top:10px;
+  .panel_bottom {
+    font-size:24px;
+    margin-bottom:20px;
   }
 
   /* p5_wa.png（中央・後ろ側） */
-  #effect_image {
-    display:none;
-    position:fixed;
+  .effect_image {
+    position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
-    z-index:400; /* ← GAME OVER より後ろ */
+    z-index:400;
     opacity:0.5;
+    display:block;
   }
 
-  #effect_img {
+  .effect_image img {
     width:60vw;
     max-width:350px;
-  }
-
-  #gameover_bottom {
-    font-size:24px;
-    margin-bottom:20px;
   }
 </style>
 </head>
@@ -143,22 +154,39 @@
 
 </div>
 
-<!-- ゲームオーバー画面 -->
-<div id="gameover_screen">
+<!-- ✅ スタート画面 -->
+<div id="start_screen" class="full_screen_panel">
 
-  <!-- 上部：GAME OVER と SCORE -->
-  <div id="gameover_top">
-    <div>GAME OVER</div>
-    <div id="gameover_score"></div>
+  <div class="panel_top">
+    <div style="font-size:40px;">どのパンかな？</div>
+    <div style="font-size:24px; margin-top:10px;">連続正解してスコアを稼ごう！</div>
   </div>
 
-  <!-- 中央：p5_wa.png（背景） -->
-  <div id="effect_image">
-    <img id="effect_img" src="">
+  <div class="panel_center">
+    <div class="effect_image">
+      <img src="p5_wa.png">
+    </div>
   </div>
 
-  <!-- 下部：タップして再スタート -->
-  <div id="gameover_bottom">画面をタップして再スタート</div>
+  <div class="panel_bottom">画面をタップしてスタート</div>
+
+</div>
+
+<!-- ✅ ゲームオーバー画面 -->
+<div id="gameover_screen" class="full_screen_panel">
+
+  <div class="panel_top">
+    <div style="font-size:40px;">GAME OVER</div>
+    <div id="gameover_score" style="font-size:60px;"></div>
+  </div>
+
+  <div class="panel_center">
+    <div class="effect_image">
+      <img src="p5_wa.png">
+    </div>
+  </div>
+
+  <div class="panel_bottom">画面をタップして再スタート</div>
 
 </div>
 
@@ -184,35 +212,21 @@ let life = 3;
 let correctId = "";
 let gameover = false;
 
-// ライフ表示
-function updateLife() {
-  document.getElementById("life").innerText = "❤️".repeat(life);
-}
-
-// コンボランク判定
-function getComboRank(c) {
-  if (c >= 100) return "SSS";
-  if (c >= 50) return "SS";
-  if (c >= 30) return "S";
-  if (c >= 20) return "A";
+/* ✅ コンボ文字列 */
+function getComboText(c) {
+  if (c >= 100) return "SSS!!!!!";
+  if (c >= 50) return "SS!!!";
+  if (c >= 30) return "S!!";
+  if (c >= 20) return "A!";
   if (c >= 10) return "B";
-  if (c >= 6) return "C";
-  if (c >= 3) return "D";
+  if (c >= 6) return "C..";
+  if (c >= 3) return "D...";
   return "";
 }
 
-// ランクごとのスコア加算
-function getScoreBonus(rank) {
-  switch(rank) {
-    case "D": return 2;
-    case "C": return 3;
-    case "B": return 5;
-    case "A": return 10;
-    case "S": return 20;
-    case "SS": return 50;
-    case "SSS": return 100;
-    default: return 1;
-  }
+// ライフ表示
+function updateLife() {
+  document.getElementById("life").innerText = "❤️".repeat(life);
 }
 
 function startRound() {
@@ -239,18 +253,19 @@ function checkAnswer(selectedId) {
 
   if (selectedId === correctId) {
     combo++;
-    const rank = getComboRank(combo);
 
-    document.getElementById("combo").innerText =
-      rank ? `COMBO ${combo} (${rank})` : `COMBO ${combo}`;
+    const comboText = getComboText(combo);
+    const comboDiv = document.getElementById("combo");
 
-    score += getScoreBonus(rank);
+    comboDiv.innerText = comboText;
+
+    // ✅ 跳ねるアニメーション
+    comboDiv.classList.remove("combo-anim");
+    void comboDiv.offsetWidth;
+    comboDiv.classList.add("combo-anim");
+
+    score++;
     document.getElementById("score").innerText = "スコア: " + score;
-
-    if (rank === "S" || rank === "SS" || rank === "SSS") {
-      life++;
-      updateLife();
-    }
 
     startRound();
 
@@ -279,25 +294,15 @@ function showMiss() {
 function doGameOver() {
   gameover = true;
 
-  // p5 の音
   document.getElementById("p5").play();
 
-  // p5_wa の画像を中央に表示
-  const effect = document.getElementById("effect_image");
-  const img = document.getElementById("effect_img");
-  img.src = "p5_wa.png";
-  effect.style.display = "block";
-
-  // パン画像を消す
   document.getElementById("images").innerHTML = "";
   document.getElementById("combo").innerText = "";
 
-  // GAME OVER 画面を表示
   const screen = document.getElementById("gameover_screen");
   document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
   screen.style.display = "flex";
 
-  // タップで再スタート
   screen.onclick = () => restartGame();
 }
 
@@ -310,16 +315,20 @@ function restartGame() {
   document.getElementById("score").innerText = "スコア: 0";
   updateLife();
 
-  // ゲームオーバー画像を消す
-  document.getElementById("effect_image").style.display = "none";
   document.getElementById("gameover_screen").style.display = "none";
 
   startRound();
 }
 
-// ゲーム開始
+/* ✅ スタート画面から開始 */
+document.getElementById("start_screen").style.display = "flex";
+document.getElementById("start_screen").onclick = () => {
+  document.getElementById("start_screen").style.display = "none";
+  startRound();
+};
+
+// ゲーム開始前にライフ表示
 updateLife();
-startRound();
 </script>
 
 </body>
