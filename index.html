@@ -4,69 +4,133 @@
 <meta charset="UTF-8">
 <title>SunSun パンゲーム</title>
 <style>
-  body { text-align:center; font-size:22px; margin:0; padding:0; }
+  * {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
 
-  /* パン画像を2×2に固定配置 */
+  body {
+    font-size:22px;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:white;
+  }
+
+  /* ゲーム全体を画面いっぱいに */
+  #game_container {
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  h1 {
+    margin-top:10px;
+    font-size:28px;
+  }
+
+  #score {
+    margin-top:5px;
+  }
+
+  #combo {
+    font-size:28px;
+    color:#ff8800;
+    height:40px;
+  }
+
+  #miss {
+    font-size:40px;
+    color:red;
+    display:none;
+  }
+
+  /* パン画像の2×2レイアウト（スマホ対応） */
   #images {
     display:grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap:20px;
+    gap:10px;
     width:100%;
-    max-width:500px;
-    margin:20px auto;
-  }
-  #images img {
-    width:160px;
-    height:auto;
-    margin:auto;
+    flex-grow:1;
+    padding:10px;
+    justify-items:center;
+    align-items:center;
   }
 
+  #images img {
+    width:35vw;
+    max-width:180px;
+  }
+
+  /* ハート（ライフ）をパン画像の下に中央配置 */
   #life {
-    position:fixed;
-    bottom:10px;
-    left:10px;
-    font-size:32px;
+    position:relative;
+    bottom:0;
+    margin-bottom:15px;
+    font-size:60px; /* ← 3倍に拡大 */
+    text-align:center;
     z-index:1000;
   }
 
-  #combo { font-size:28px; color:#ff8800; height:40px; }
-  #miss { font-size:40px; color:red; display:none; }
-
-  /* ゲームオーバー画面（前面） */
+  /* ゲームオーバー画面（上・中央・下に分割） */
   #gameover_screen {
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
     background:white;
     display:none;
-    justify-content:center;
-    align-items:center;
     flex-direction:column;
-    font-size:40px;
+    justify-content:space-between;
+    align-items:center;
+    padding:40px 0;
     z-index:900;
   }
-  #gameover_score {
-    font-size:60px;
-    margin:20px;
+
+  #gameover_top {
+    text-align:center;
   }
 
-  /* p5_wa の画像（後ろ側） */
+  #gameover_top div:first-child {
+    font-size:40px;
+  }
+
+  #gameover_score {
+    font-size:60px;
+    margin-top:10px;
+  }
+
+  /* p5_wa.png（中央・後ろ側） */
   #effect_image {
     display:none;
     position:fixed;
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
-    z-index:500; /* ← GAME OVER より後ろ */
-    opacity:0.4;
+    z-index:400; /* ← GAME OVER より後ろ */
+    opacity:0.5;
   }
+
   #effect_img {
-    width:350px;
+    width:60vw;
+    max-width:350px;
+  }
+
+  #gameover_bottom {
+    font-size:24px;
+    margin-bottom:20px;
   }
 </style>
 </head>
 <body>
+
+<div id="game_container">
 
 <h1>SunSun パンゲーム</h1>
 <p id="score">スコア: 0</p>
@@ -75,19 +139,27 @@
 
 <div id="images"></div>
 
-<!-- ❤️ ライフ表示（必ず表示される） -->
 <div id="life">❤️❤️❤️</div>
+
+</div>
 
 <!-- ゲームオーバー画面 -->
 <div id="gameover_screen">
-  <div>GAME OVER</div>
-  <div id="gameover_score"></div>
-  <div style="font-size:24px;">画面をタップして再スタート</div>
-</div>
 
-<!-- ゲームオーバー時の背景画像 -->
-<div id="effect_image">
-  <img id="effect_img" src="">
+  <!-- 上部：GAME OVER と SCORE -->
+  <div id="gameover_top">
+    <div>GAME OVER</div>
+    <div id="gameover_score"></div>
+  </div>
+
+  <!-- 中央：p5_wa.png（背景） -->
+  <div id="effect_image">
+    <img id="effect_img" src="">
+  </div>
+
+  <!-- 下部：タップして再スタート -->
+  <div id="gameover_bottom">画面をタップして再スタート</div>
+
 </div>
 
 <!-- SE 読み込み -->
@@ -210,7 +282,7 @@ function doGameOver() {
   // p5 の音
   document.getElementById("p5").play();
 
-  // p5_wa の画像を表示（後ろ側）
+  // p5_wa の画像を中央に表示
   const effect = document.getElementById("effect_image");
   const img = document.getElementById("effect_img");
   img.src = "p5_wa.png";
