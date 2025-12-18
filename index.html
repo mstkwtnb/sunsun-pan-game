@@ -137,7 +137,7 @@
 
   .panel_bottom {
     font-size:24px;
-    margin-bottom:20px;
+    margin-bottom:15vh; /* ✅ ハートに被らないように調整 */
   }
 
   /* p5_wa.png（中央・後ろ側） */
@@ -286,9 +286,9 @@ function checkAnswer(selectedId) {
 
     comboBlock.style.display = "block";
 
-    /* ✅ 動的フォントサイズ */
-    const baseNum = 32 * 2;
-    const baseRank = 32 * 3;
+    /* ✅ 動的フォントサイズ（最小サイズ + combo×0.1） */
+    const baseNum = 64;   // コンボ数の最小サイズ
+    const baseRank = 96;  // ランク表示の最小サイズ
     const add = combo * 0.1;
 
     comboNum.style.fontSize = (baseNum + add) + "px";
