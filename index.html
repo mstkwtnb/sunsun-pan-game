@@ -6,7 +6,7 @@
 <style>
   body { text-align:center; font-size:22px; margin:0; padding:0; }
 
-  /* パン画像を大きくして2×2に配置 */
+  /* パン画像を2×2に固定配置 */
   #images {
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -14,16 +14,22 @@
     gap:20px;
     width:100%;
     max-width:500px;
-    margin:0 auto;
-    margin-top:20px;
+    margin:20px auto;
   }
   #images img {
-    width:150px;   /* ← 大きくした */
+    width:160px;
     height:auto;
     margin:auto;
   }
 
-  #life { position:fixed; bottom:10px; left:10px; font-size:28px; }
+  #life {
+    position:fixed;
+    bottom:10px;
+    left:10px;
+    font-size:32px;
+    z-index:1000;
+  }
+
   #combo { font-size:28px; color:#ff8800; height:40px; }
   #miss { font-size:40px; color:red; display:none; }
 
@@ -38,14 +44,14 @@
     align-items:center;
     flex-direction:column;
     font-size:40px;
-    z-index:900; /* ← 画像より前 */
+    z-index:900;
   }
   #gameover_score {
     font-size:60px;
     margin:20px;
   }
 
-  /* ゲームオーバー時の画像（後ろ側） */
+  /* p5_wa の画像（後ろ側） */
   #effect_image {
     display:none;
     position:fixed;
@@ -53,10 +59,10 @@
     left:50%;
     transform:translate(-50%, -50%);
     z-index:500; /* ← GAME OVER より後ろ */
-    opacity:0.4; /* 少し薄くして背景感を出す */
+    opacity:0.4;
   }
   #effect_img {
-    width:300px;
+    width:350px;
   }
 </style>
 </head>
@@ -69,6 +75,7 @@
 
 <div id="images"></div>
 
+<!-- ❤️ ライフ表示（必ず表示される） -->
 <div id="life">❤️❤️❤️</div>
 
 <!-- ゲームオーバー画面 -->
@@ -78,7 +85,7 @@
   <div style="font-size:24px;">画面をタップして再スタート</div>
 </div>
 
-<!-- ★ ゲームオーバー時に表示する画像（後ろ側） -->
+<!-- ゲームオーバー時の背景画像 -->
 <div id="effect_image">
   <img id="effect_img" src="">
 </div>
@@ -200,20 +207,20 @@ function showMiss() {
 function doGameOver() {
   gameover = true;
 
-  // ★ p5 の音を再生
+  // p5 の音
   document.getElementById("p5").play();
 
-  // ★ p5_wa の画像を表示（後ろ側）
+  // p5_wa の画像を表示（後ろ側）
   const effect = document.getElementById("effect_image");
   const img = document.getElementById("effect_img");
   img.src = "p5_wa.png";
   effect.style.display = "block";
 
-  // ★ 画像はタップするまで消さない（setTimeout 削除）
-
+  // パン画像を消す
   document.getElementById("images").innerHTML = "";
   document.getElementById("combo").innerText = "";
 
+  // GAME OVER 画面を表示
   const screen = document.getElementById("gameover_screen");
   document.getElementById("gameover_score").innerText = `SCORE: ${score}`;
   screen.style.display = "flex";
@@ -231,7 +238,7 @@ function restartGame() {
   document.getElementById("score").innerText = "スコア: 0";
   updateLife();
 
-  // ★ ゲームオーバー画像も消す
+  // ゲームオーバー画像を消す
   document.getElementById("effect_image").style.display = "none";
   document.getElementById("gameover_screen").style.display = "none";
 
